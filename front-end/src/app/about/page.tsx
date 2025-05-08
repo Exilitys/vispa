@@ -15,8 +15,6 @@ export default function About() {
   );
 }
 
-import { AnimatedTestimonials } from "@/components/ui/animated-testimonials";
-
 // const DummyContent = () => {
 //   return (
 //     <div className="grid grid-cols-1 h-[40rem] w-full bg-white dark:bg-black relative border border-neutral-200 dark:border-white/[0.2] rounded-md">
