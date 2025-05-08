@@ -12,7 +12,7 @@ export default async function Profile() {
       <Navbar />
       <FloatingNavbar />
       <div className="mx-10 flex flex-col gap-20 mt-24">
-        <div className="flex md:flex-row justify-center mx-auto w-fit items-center gap-10 flex-col">
+        <div className="flex md:flex-row justify-center mx-auto items-center gap-10 flex-col">
           <ProfilePicture />
           <ProfileStats />
         </div>
