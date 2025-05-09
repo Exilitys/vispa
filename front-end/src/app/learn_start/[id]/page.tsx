@@ -1,18 +1,20 @@
+import { redirect } from "next/navigation";
 import FloatingNavbar from "@/components/ui/floating-navbar";
 import Navbar from "@/components/ui/navbar";
 import VideoComponent from "@/components/ui/video-component";
 import { IconArrowRight } from "@tabler/icons-react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { createClient } from "../../../../utils/supabase/Client";
 
 export const dynamic = "force-dynamic";
 
-export default async function DriveVideoPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+interface PageParams {
+  params: {
+    id: string;
+  };
+}
+
+export default async function DriveVideoPage({ params }: PageParams) {
   const supabase = createClient();
 
   const {
