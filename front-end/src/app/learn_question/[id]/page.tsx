@@ -1,5 +1,5 @@
 import { createClient } from "../../../../utils/supabase/Client";
-const supabase = createClient();
+
 import QuizClient from "@/components/learn/quizclient";
 interface Question {
   id: number;
@@ -13,6 +13,7 @@ interface Question {
   };
 }
 export default async function Page(props: { params: Promise<{ id: string }> }) {
+  const supabase = createClient();
   const params = await props.params;
   const { data: questions } = await supabase
     .from("Questions")
