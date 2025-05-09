@@ -37,7 +37,7 @@ export default async function DriveVideoPage(props: {
           {course.course_name}
         </h2>
       </div>
-      <div className="flex justify-center ">
+      <div className="flex justify-center">
         <VideoComponent src={course.video} className="w-md md:w-2xl" />
       </div>
 
