@@ -1,5 +1,7 @@
 import { createClient } from "../../../../utils/supabase/Client";
 
+export const dynamic = "force-dynamic";
+
 import QuizClient from "@/components/learn/quizclient";
 interface Question {
   id: number;

@@ -3,12 +3,19 @@ import Navbar from "@/components/ui/navbar";
 import VideoComponent from "@/components/ui/video-component";
 import { IconArrowRight } from "@tabler/icons-react";
 import Link from "next/link";
-import { createClient } from "../../../../utils/supabase/Client";
+// import { createClient } from "../../../../utils/supabase/Client";
+import { cookies } from "next/headers";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+
+const supabase = createServerComponentClient({ cookies });
+
+export const dynamic = "force-dynamic";
 
 export default async function DriveVideoPage(props: {
   params: Promise<{ id: string }>;
 }) {
-  const supabase = createClient();
+  // const supabase = createClient();
+  const supabase = createServerComponentClient({ cookies });
   const params = await props.params;
   const { data: course, error } = await supabase
     .from("MsCourses")
