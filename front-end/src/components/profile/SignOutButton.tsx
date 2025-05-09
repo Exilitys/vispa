@@ -12,7 +12,7 @@ export default function SignOutButton() {
     if (error) {
       console.error("Sign out error:", error.message);
     } else {
-      window.location.href = "/"; // redirect after sign-out
+      window.location.href = "/login"; // redirect after sign-out
     }
   };
 
