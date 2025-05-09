@@ -7,8 +7,6 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 
-const supabase = createServerComponentClient({ cookies });
-
 export const dynamic = "force-dynamic";
 
 export default async function DriveVideoPage(props: {
