@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import FloatingNavbar from "@/components/ui/floating-navbar";
 import Navbar from "@/components/ui/navbar";
 import VideoComponent from "@/components/ui/video-component";
@@ -8,23 +7,11 @@ import { createClient } from "../../../../utils/supabase/Client";
 
 export const dynamic = "force-dynamic";
 
-interface PageParams {
-  params: {
-    id: string;
-  };
-}
-
-export default async function DriveVideoPage({ params }: PageParams) {
+export default async function DriveVideoPage({ params }: { params: { id: string } }) {
+  // Initialize the Supabase client here
   const supabase = createClient();
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session) {
-    redirect("/login");
-  }
-
+  // Fetch course data
   const { data: course, error } = await supabase
     .from("MsCourses")
     .select("*")
