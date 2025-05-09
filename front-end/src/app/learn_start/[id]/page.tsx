@@ -6,6 +6,8 @@ import Link from "next/link";
 import { createClient } from "../../../../utils/supabase/Client";
 const supabase = createClient();
 
+export const dynamic = "force-dynamic";
+
 export default async function DriveVideoPage(props: {
   params: Promise<{ id: string }>;
 }) {
