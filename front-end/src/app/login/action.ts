@@ -16,7 +16,7 @@ export async function login(formData: FormData) {
 
   if (error) {
     console.error("Login failed:", error.message); // Add error message logging
-    redirect("/error");
+    return error.message;
   }
 
   revalidatePath("/home", "layout");
@@ -43,7 +43,7 @@ export async function signup(formData: FormData) {
 
   if (signUpError || !signUpData.user) {
     console.error("Signup failed:", signUpError?.message);
-    redirect("/error");
+    return signUpError?.message;
   }
 
   // Attempt login immediately after signup
@@ -54,7 +54,7 @@ export async function signup(formData: FormData) {
 
   if (loginError) {
     console.error("Login failed after sign-up:", loginError.message);
-    redirect("/error");
+    return loginError.message;
   }
 
   revalidatePath("/home", "layout");
