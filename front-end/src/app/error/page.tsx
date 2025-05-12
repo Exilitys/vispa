@@ -12,7 +12,7 @@ export default function ErrorPage() {
         Oops! Something went wrong
       </h1>
       <p className="text-lg text-gray-700 dark:text-gray-300 mb-8">
-        We're sorry, but an unexpected error has occurred.
+        We&apos;re sorry, but an unexpected error has occurred.
       </p>
       <button
         onClick={() => router.push("/")}
