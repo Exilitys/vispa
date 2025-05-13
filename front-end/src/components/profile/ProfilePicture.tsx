@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { createClient } from "../../../utils/supabase/Client";
+import { useRouter } from "next/navigation";
 const supabase = createClient();
 
 export default function ProfilePicture() {
@@ -11,6 +12,8 @@ export default function ProfilePicture() {
     profile_picture: string;
     created_at: string;
   } | null>(null);
+
+  const router = useRouter();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -21,13 +24,14 @@ export default function ProfilePicture() {
 
       if (userError || !user) {
         console.error("Error getting user:", userError);
+        router.push("/login");
         return;
       }
 
       const { data, error } = await supabase
         .from("MsUser")
         .select("name, profile_picture, created_at")
-        .eq("uuid", user.id)
+        .eq("uuid", user?.id)
         .single();
 
       if (error) {

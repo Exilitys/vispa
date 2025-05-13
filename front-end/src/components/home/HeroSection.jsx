@@ -10,7 +10,7 @@ const HeroSection = () => {
       <div className="max-w-6xl mx-auto flex flex-col-reverse md:flex-row items-center justify-between gap-8">
         <div className="max-w-xl">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Learn Indonesian Sign Language the Fun Way
+            Learn Sign Language the Fun Way
           </h1>
           <p className="text-gray-600 mb-6">
             Learn sign language through interactive lessons, real-time feedback,

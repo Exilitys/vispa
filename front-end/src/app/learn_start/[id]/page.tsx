@@ -5,10 +5,24 @@ import { IconArrowRight } from "@tabler/icons-react";
 import Link from "next/link";
 import { createClient } from "../../../../utils/supabase/Client";
 
-export default async function DriveVideoPage(props: {
+import { redirect } from "next/navigation";
+
+export default async function LearnStart(props: {
   params: Promise<{ id: string }>;
 }) {
   const supabase = createClient();
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    // console.error("Error getting user:", userError);
+    redirect("/login");
+    return;
+  }
+
   const params = await props.params;
   const { data: course, error } = await supabase
     .from("MsCourses")

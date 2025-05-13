@@ -27,7 +27,7 @@ export default async function ContinueCourseSection({
   return (
     <div className={cn(className)}>
       <h2 className="text-2xl font-bold text-black dark:text-white max-w-4xl mx-auto my-5 text-center md:text-left">
-        Continue Lesson
+        Explore new courses
       </h2>
       <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 md:auto-rows-[18rem] md:grid-cols-3  my-12">
         {courses.map((course) => (

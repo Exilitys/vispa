@@ -12,6 +12,7 @@ const ProgressSection = () => {
     completed_lessons: 0,
     score: 0,
   });
+  const [isLoggedIn, setisLoggedIn] = useState(false);
 
   useEffect(() => {
     const fetchProgress = async () => {
@@ -21,8 +22,10 @@ const ProgressSection = () => {
       } = await supabase.auth.getUser();
 
       if (userError || !user) {
-        console.error("Error getting user:", userError);
+        setisLoggedIn(false);
         return;
+      } else {
+        setisLoggedIn(true);
       }
 
       const { data, error } = await supabase
@@ -50,7 +53,7 @@ const ProgressSection = () => {
 
     fetchProgress();
   }, []);
-
+  if (!isLoggedIn) return null;
   return (
     <div className="max-w-6xl py-6 flex flex-col md:flex-row md:items-center md:justify-evenly">
       <div className="mb-4 md:mb-0 text-left md:text-left pr-5">

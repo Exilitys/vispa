@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import FloatingNavbar from "@/components/ui/floating-navbar";
 import Navbar from "@/components/ui/navbar";
@@ -45,7 +46,7 @@ export default function About() {
     <div className="relative  w-full">
       <Navbar />
       <FloatingNavbar />
-      <h1 className="text-3xl font-bold text-center mt-24">About Us</h1>
+      <p className="text-3xl font-bold text-center mt-24">About Us</p>
 
       <AnimatedTestimonials testimonials={testimonials} />
       <FooterSection />
