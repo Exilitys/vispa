@@ -6,7 +6,7 @@ import Navbar from "@/components/ui/navbar";
 import VideoComponent from "@/components/ui/video-component";
 import { IconArrowRight } from "@tabler/icons-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { createClient } from "../../../../utils/supabase/Client";
 
 type Course = {
@@ -15,15 +15,20 @@ type Course = {
   video: string;
 };
 
-export default function LearnStart({ params }: { params: { id: string } }) {
+export default function LearnStart() {
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
+  const params = useParams(); // ✅ Get dynamic route params here
   const supabase = createClient();
 
+  const id = params?.id as string; // ✅ Convert to string (params.id is string | string[] | undefined)
+
   useEffect(() => {
+    if (!id) return; // wait for id to be ready
+
     const fetchData = async () => {
       const {
         data: { user },
@@ -39,7 +44,7 @@ export default function LearnStart({ params }: { params: { id: string } }) {
       const { data, error } = await supabase
         .from("MsCourses")
         .select("*")
-        .eq("id", params.id)
+        .eq("id", id)
         .single();
 
       if (error) {
@@ -53,7 +58,7 @@ export default function LearnStart({ params }: { params: { id: string } }) {
     };
 
     fetchData();
-  }, [params.id, router, supabase]);
+  }, [id, router, supabase]);
 
   if (loading) {
     return (
@@ -87,7 +92,7 @@ export default function LearnStart({ params }: { params: { id: string } }) {
         <VideoComponent src={course.video} className="w-md md:w-2xl" />
       </div>
 
-      <Link href={`/learn_question/${params.id}`}>
+      <Link href={`/learn_question/${id}`}>
         <div className="my-12 flex flex-row justify-center items-center">
           <h2 className="text-3xl font-bold text-black dark:text-white px-5 text-center md:text-left max-w-3/4">
             Next
