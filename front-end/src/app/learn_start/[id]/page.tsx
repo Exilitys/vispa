@@ -9,8 +9,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "../../../../utils/supabase/Client";
 
+type Course = {
+  id: string;
+  course_name: string;
+  video: string;
+};
+
 export default function LearnStart({ params }: { params: { id: string } }) {
-  const [course, setCourse] = useState<any>(null);
+  const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
