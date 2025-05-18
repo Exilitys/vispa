@@ -1,46 +1,97 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { BentoGridItem } from "../ui/bento-grid";
-import { IconClockHour1 } from "@tabler/icons-react";
-import { IconBook } from "@tabler/icons-react";
+import { IconClockHour1, IconBook } from "@tabler/icons-react";
 import { createClient } from "../../../utils/supabase/Client";
+import { Input } from "../ui/input";
 
-export const dynamic = "force-dynamic"; // if you want fresh SSR every time
+const supabase = createClient();
 
-export default async function CourseGridSection() {
-  const supabase = createClient();
-  const { data: courses, error } = await supabase
-    .from("MsCourses")
-    .select("*")
-    .order("id", { ascending: true });
+export interface Course {
+  id: number;
+  course_name: string;
+  description: string;
+  dificulty: string;
+  length: number;
+  image?: string;
+}
 
-  if (error) {
-    console.error("Error fetching courses:", error.message);
-    return <p>Failed to load courses.</p>;
-  }
+export default function CourseGridSection() {
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("MsCourses")
+        .select("*")
+        .order("id", { ascending: true });
+
+      if (error) {
+        console.error("Error fetching courses:", error.message);
+        setCourses([]);
+      } else {
+        setCourses(data || []);
+      }
+      setLoading(false);
+    };
+
+    fetchCourses();
+  }, []);
+
+  useEffect(() => {
+    const filtered = courses.filter((course) =>
+      course.course_name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredCourses(filtered);
+  }, [searchTerm, courses]);
 
   return (
     <div className="my-12 flex flex-col justify-center items-center">
       <h2 className="text-3xl font-bold text-black dark:text-white my-5 text-center md:text-left max-w-3/4">
         Courses
       </h2>
-      <div className="mx-auto grid max-w-3/4 grid-cols-1 gap-6  md:grid-cols-3  my-12">
-        {courses?.map((course) => (
-          <BentoGridItem
-            key={course.id}
-            title={course.course_name}
-            description={CourseDescription({
-              description: course.description,
-              difficulty: course.dificulty,
-              length: `${course.length} minutes`,
-            })}
-            header={<Skeleton src={course.image} />}
-            links={`/learn_start/${course.id}`}
-            className="h-fit"
-          />
-        ))}
-      </div>
+
+      <Input
+        type="text"
+        className="w-3xl bg-zinc-100"
+        placeholder="Search courses by name..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+
+      {loading ? (
+        <p>Loading courses...</p>
+      ) : (
+        <div className="mx-auto grid max-w-3/4 grid-cols-1 gap-6 md:grid-cols-3 my-6">
+          {filteredCourses.length > 0 ? (
+            filteredCourses.map((course) => (
+              <BentoGridItem
+                key={course.id}
+                title={course.course_name}
+                description={CourseDescription({
+                  description: course.description,
+                  difficulty: course.dificulty,
+                  length: `${course.length} minutes`,
+                })}
+                header={<Skeleton src={course.image} />}
+                links={`/learn_start/${course.id}`}
+                className="h-fit"
+              />
+            ))
+          ) : (
+            <p className="col-span-full text-gray-500">No courses found.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
+
 const Skeleton = ({ src }: { src?: string; alt?: string }) => {
   return src ? (
     <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl overflow-hidden">
@@ -67,7 +118,7 @@ const CourseDescription = ({
       ? "text-yellow-500"
       : difficulty.toLowerCase() === "hard"
       ? "text-red-500"
-      : "text-gray-500"; // fallback if unknown
+      : "text-gray-500";
 
   return (
     <div className="text-sm text-gray-600 dark:text-gray-400 space-y-4">
