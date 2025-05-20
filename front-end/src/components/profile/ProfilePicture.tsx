@@ -77,7 +77,7 @@ export default function ProfilePicture() {
       const fileName = `${user.id}_${Date.now()}.${fileExt}`;
       const filePath = `${fileName}`;
 
-      let { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from("profile-picture")
         .upload(filePath, file, {
           cacheControl: "3600",
@@ -111,8 +111,8 @@ export default function ProfilePicture() {
       setProfile((prev) =>
         prev ? { ...prev, profile_picture: publicUrl } : prev
       );
-    } catch (err: any) {
-      setUploadError(err.message || "Unknown error");
+    } catch (err) {
+      setUploadError((err as Error).message || "Unknown error");
     }
     setUploading(false);
   };
