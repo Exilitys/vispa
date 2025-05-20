@@ -3,6 +3,7 @@
 import { useEffect, useState, ChangeEvent } from "react";
 import { createClient } from "../../../utils/supabase/Client";
 import { useRouter } from "next/navigation";
+import { Pencil, Check, X } from "lucide-react";
 
 const supabase = createClient();
 
@@ -15,6 +16,9 @@ export default function ProfilePicture() {
 
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [savingName, setSavingName] = useState(false);
 
   const router = useRouter();
 
@@ -31,9 +35,6 @@ export default function ProfilePicture() {
         return;
       }
 
-      // 👍 THIS LINE WORKS NOW
-      console.log("Current user UUID:", user.id);
-
       const { data, error } = await supabase
         .from("MsUser")
         .select("name, profile_picture, created_at")
@@ -46,22 +47,20 @@ export default function ProfilePicture() {
       }
 
       setProfile(data);
+      setNewName(data.name);
     };
 
     fetchProfile();
   }, []);
 
-  // Handle profile picture upload
   const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
     setUploadError(null);
     if (!e.target.files || e.target.files.length === 0) return;
 
     const file = e.target.files[0];
-
     setUploading(true);
 
     try {
-      // Get the current user
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -72,7 +71,6 @@ export default function ProfilePicture() {
         return;
       }
 
-      // Upload image to Supabase Storage
       const fileExt = file.name.split(".").pop();
       const fileName = `${user.id}_${Date.now()}.${fileExt}`;
       const filePath = `${fileName}`;
@@ -90,12 +88,10 @@ export default function ProfilePicture() {
         return;
       }
 
-      // Get the public URL
       const {
         data: { publicUrl },
       } = supabase.storage.from("profile-picture").getPublicUrl(filePath);
 
-      // Update the user's profile_picture in MsUser
       const { error: updateError } = await supabase
         .from("MsUser")
         .update({ profile_picture: publicUrl })
@@ -107,7 +103,6 @@ export default function ProfilePicture() {
         return;
       }
 
-      // Refresh the profile
       setProfile((prev) =>
         prev ? { ...prev, profile_picture: publicUrl } : prev
       );
@@ -115,6 +110,30 @@ export default function ProfilePicture() {
       setUploadError((err as Error).message || "Unknown error");
     }
     setUploading(false);
+  };
+
+  const handleNameUpdate = async () => {
+    setSavingName(true);
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) throw new Error("Not authenticated.");
+
+      const { error } = await supabase
+        .from("MsUser")
+        .update({ name: newName })
+        .eq("uuid", user.id);
+
+      if (error) throw error;
+
+      setProfile((prev) => (prev ? { ...prev, name: newName } : prev));
+      setEditing(false);
+    } catch (err) {
+      console.error("Failed to update name:", err);
+    }
+    setSavingName(false);
   };
 
   if (!profile) return <p className="text-center p-6">Loading...</p>;
@@ -150,10 +169,36 @@ export default function ProfilePicture() {
         <p className="text-sm text-red-500 mb-2">{uploadError}</p>
       )}
 
-      <h2 className="text-xl font-semibold">
-        {profile.name.charAt(0).toUpperCase() +
-          profile.name.slice(1).toLowerCase()}
-      </h2>
+      {/* Name with edit icon */}
+      <div className="flex items-center gap-2 mb-1">
+        {editing ? (
+          <>
+            <input
+              type="text"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              className="px-2 w-40 py-1 rounded-md border border-gray-300 dark:bg-gray-800 dark:text-white"
+            />
+            <button onClick={handleNameUpdate} disabled={savingName}>
+              <Check size={18} className="text-green-500" />
+            </button>
+            <button onClick={() => setEditing(false)}>
+              <X size={18} className="text-red-500" />
+            </button>
+          </>
+        ) : (
+          <>
+            <h2 className="text-xl font-semibold">
+              {profile.name.charAt(0).toUpperCase() +
+                profile.name.slice(1).toLowerCase()}
+            </h2>
+            <button onClick={() => setEditing(true)}>
+              <Pencil size={16} className="text-gray-500 hover:text-gray-700" />
+            </button>
+          </>
+        )}
+      </div>
+
       <p className="text-sm text-gray-600 dark:text-gray-400">
         Joined {joinedDate}
       </p>
