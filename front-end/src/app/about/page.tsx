@@ -29,7 +29,7 @@ export default function About() {
     },
     {
       quote:
-        "Outstanding support and robust features. It's rare to find a product that delivers on all its promises.",
+        "Worked on the front-end and added several key features to improve usability and performance.",
       name: "William Yosua Montolalu",
       designation: "University Student at Binus University",
       src: "/Image/yos.jpg",
