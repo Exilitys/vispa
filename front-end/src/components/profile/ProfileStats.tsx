@@ -6,11 +6,6 @@ import { BarChart2, BookOpen, Flame, Star } from "lucide-react";
 import { createClient } from "../../../utils/supabase/Client";
 const supabase = createClient();
 
-interface Course {
-  id: number;
-  course_name: string;
-}
-
 export default function ProfileStats() {
   const [stats, setStats] = useState({
     completed_lessons: 0,
@@ -20,7 +15,6 @@ export default function ProfileStats() {
     score: 0,
     streak_days: 0,
   });
-  const [completedCourses, setCompletedCourses] = useState<Course[]>([]);
 
   useEffect(() => {
     const fetchUserStats = async () => {
@@ -44,22 +38,7 @@ export default function ProfileStats() {
         .from("MsCourses")
         .select("*", { count: "exact", head: true });
 
-      // 4) If the user has completed any, grab those course records
-      let completed: Course[] = [];
-      if (
-        Array.isArray(userRow.completed_lessons) &&
-        userRow.completed_lessons.length
-      ) {
-        const { data: rows, error: coursesError } = await supabase
-          .from("MsCourses")
-          .select("id, course_name")
-          .in("id", userRow.completed_lessons as number[]);
-        if (coursesError)
-          console.error("Fetch completed courses error:", coursesError);
-        else completed = rows as Course[];
-      }
-
-      // 5) Update our two bits of state
+      // 4) Set stats only (not completed courses)
       setStats({
         completed_lessons: Array.isArray(userRow.completed_lessons)
           ? userRow.completed_lessons.length
@@ -72,7 +51,6 @@ export default function ProfileStats() {
         score: userRow.score ?? 0,
         streak_days: userRow.streak_days ?? 0,
       });
-      setCompletedCourses(completed);
     };
 
     fetchUserStats();

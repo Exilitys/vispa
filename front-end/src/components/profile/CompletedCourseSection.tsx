@@ -1,124 +1,115 @@
-// src/components/profile/ProfileStats.tsx
 "use client";
 
 import { useEffect, useState } from "react";
-import { Progress } from "@/components/ui/progress";
-import { BarChart2, BookOpen, Flame, Star } from "lucide-react";
 import { createClient } from "../../../utils/supabase/Client";
+import { BentoGridItem } from "@/components/ui/bento-grid";
+import { IconClockHour1, IconBook } from "@tabler/icons-react";
+import { cn } from "@/lib/utils";
 
-const supabase = createClient();
+interface Course {
+  id: number;
+  course_name: string;
+  description: string;
+  image?: string;
+  dificulty: string;
+  length: number;
+}
 
-export default function ProfileStats() {
-  const [stats, setStats] = useState({
-    completed_lessons: 0,
-    total_lessons: 0,
-    signs_learned: 0,
-    total_signs: 16,
-    score: 0,
-    streak_days: 0,
-  });
+export default function CompletedCourseSection({
+  className,
+}: {
+  className?: string;
+}) {
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const supabase = createClient();
 
   useEffect(() => {
-    const fetchUserStats = async () => {
-      // 1) Get authenticated user
+    const load = async () => {
       const {
         data: { user },
-        error: userError,
+        error: userErr,
       } = await supabase.auth.getUser();
-      if (userError || !user) {
-        console.error("Failed to get user:", userError);
-        return;
-      }
+      if (userErr || !user) return setError("Not signed in");
 
-      // 2) Load the MsUser row
-      const { data: userRow, error: userRowError } = await supabase
+      const { data: userRow, error: rowErr } = await supabase
         .from("MsUser")
-        .select("completed_lessons, signs_learned, score, streak_days")
+        .select("completed_lessons")
         .eq("uuid", user.id)
         .single();
-      if (userRowError) {
-        console.error("Error fetching user row:", userRowError);
-        return;
+      if (rowErr || !userRow) return setError("Couldn’t load your record");
+
+      if (
+        Array.isArray(userRow.completed_lessons) &&
+        userRow.completed_lessons.length
+      ) {
+        const { data, error: courseErr } = await supabase
+          .from("MsCourses")
+          .select("id, course_name, description, image, dificulty, length")
+          .in("id", userRow.completed_lessons as number[]);
+        if (courseErr) return setError("Couldn’t load courses");
+        setCourses(data || []);
       }
 
-      // 3) Count all courses for total_lessons
-      const { count: courseCount } = await supabase
-        .from("MsCourses")
-        .select("*", { count: "exact", head: true });
-
-      setStats({
-        completed_lessons: Array.isArray(userRow.completed_lessons)
-          ? (userRow.completed_lessons as any[]).length
-          : 0,
-        total_lessons: courseCount ?? 0,
-        signs_learned: Array.isArray(userRow.signs_learned)
-          ? (userRow.signs_learned as any[]).length
-          : 0,
-        total_signs: 16,
-        score: userRow.score ?? 0,
-        streak_days: userRow.streak_days ?? 0,
-      });
+      setLoading(false);
     };
+    load();
+  }, [supabase]);
 
-    fetchUserStats();
-  }, []);
+  if (loading) return <p className="text-center">Loading completed courses…</p>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
+  if (!courses.length)
+    return (
+      <p className="text-center text-gray-500">
+        You haven’t completed any courses yet.
+      </p>
+    );
 
-  const percent = stats.total_lessons
-    ? Math.round((stats.completed_lessons / stats.total_lessons) * 100)
-    : 0;
+  const diffColor = (d: string) =>
+    d.toLowerCase() === "easy"
+      ? "text-green-500"
+      : d.toLowerCase() === "medium"
+      ? "text-yellow-500"
+      : "text-red-500";
 
   return (
-    <section className="max-w-4xl w-full px-4 py-8 mx-auto">
-      {/* Header */}
-      <div className="flex items-center space-x-2 text-blue-600 font-medium mb-6">
-        <BarChart2 className="w-5 h-5" />
-        <span>Learning Stats</span>
-      </div>
+    <div className={cn(className)}>
+      <h2 className="text-2xl font-bold text-black dark:text-white max-w-4xl mx-auto my-5 text-center md:text-left">
+        Courses Completed
+      </h2>
 
-      {/* Stats grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Completed Lessons & Progress */}
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 space-y-4">
-          <h2 className="font-semibold text-lg md:text-xl">
-            Your Learning Stats
-          </h2>
-
-          <div className="space-y-1">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center text-sm text-gray-700 dark:text-gray-300">
-              <div className="flex items-center space-x-2">
-                <BookOpen className="w-4 h-4" />
-                <span>Completed Lessons</span>
+      <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 my-12 md:auto-rows-[18rem] md:grid-cols-3">
+        {courses.map((c) => (
+          <BentoGridItem
+            key={c.id}
+            links={`/learn_start/${c.id}`}
+            header={
+              c.image ? (
+                <div className="flex-1 w-full h-full rounded-xl overflow-hidden">
+                  <img src={c.image} className="object-cover w-full h-full" />
+                </div>
+              ) : (
+                <div className="flex-1 w-full h-full rounded-xl bg-neutral-200 animate-pulse" />
+              )
+            }
+            title={c.course_name}
+            description={
+              <div className="text-sm space-y-3">
+                <div>{c.description}</div>
+                <div className="flex items-center space-x-2">
+                  <IconBook />{" "}
+                  <span className={diffColor(c.dificulty)}>{c.dificulty}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <IconClockHour1 /> <span>{c.length} minutes</span>
+                </div>
               </div>
-              <span className="font-semibold">
-                {stats.completed_lessons}/{stats.total_lessons}
-              </span>
-            </div>
-            <Progress value={percent} className="h-2 rounded" />
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              {percent}% complete
-            </p>
-          </div>
-
-          <div className="flex justify-between items-center text-sm text-gray-700 dark:text-gray-300">
-            <div className="flex items-center space-x-2">
-              <Star className="w-4 h-4 text-yellow-500" />
-              <span>Score Earned</span>
-            </div>
-            <span className="font-semibold">{stats.score} pts</span>
-          </div>
-        </div>
-
-        {/* Current Streak */}
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col justify-center">
-          <div className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300 mb-2">
-            <Flame className="w-4 h-4 text-purple-600" />
-            <span>Current Streak</span>
-          </div>
-          <p className="text-purple-600 text-2xl font-bold">
-            {stats.streak_days} days
-          </p>
-        </div>
+            }
+            className="h-fit"
+          />
+        ))}
       </div>
-    </section>
+    </div>
   );
 }
