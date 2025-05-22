@@ -5,6 +5,7 @@ import ProfilePicture from "@/components/profile/ProfilePicture";
 import ContinueCourseSection from "@/components/home/ContinueCourseSection";
 import FooterSection from "@/components/home/FooterSection";
 import SignOutButton from "@/components/profile/SignOutButton"; // ✅ Import client button
+import CompletedCourseSection from "@/components/profile/CompletedCourseSection";
 
 export default async function Profile() {
   return (
@@ -16,6 +17,8 @@ export default async function Profile() {
           <ProfilePicture />
           <ProfileStats />
         </div>
+        {/* Completed Courses */}
+        <CompletedCourseSection className="mb-32" />
         <ContinueCourseSection className="mb-32" />
         <div className="mx-auto flex justify-center items-center">
           <SignOutButton /> {/* ✅ Client button inserted here */}

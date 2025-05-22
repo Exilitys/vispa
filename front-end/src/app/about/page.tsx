@@ -29,10 +29,10 @@ export default function About() {
     },
     {
       quote:
-        "Worked on the front-end and added several key features to improve usability and performance.",
+        "Worked on the front-end to enhance usability and performance, integrating real-time data features and dynamic layouts to deliver a seamless user experience.",
       name: "William Yosua Montolalu",
       designation: "University Student at Binus University",
-      src: "/Image/yos.jpg",
+      src: "/Image/YosBaru.jpg",
     },
     {
       quote:
@@ -53,14 +53,3 @@ export default function About() {
     </div>
   );
 }
-
-// const DummyContent = () => {
-//   return (
-//     <div className="grid grid-cols-1 h-[40rem] w-full bg-white dark:bg-black relative border border-neutral-200 dark:border-white/[0.2] rounded-md">
-//       <p className="dark:text-white text-neutral-600 text-center text-4xl mt-40 font-bold">
-//         Dummy Content
-//       </p>
-//       <div className="inset-0 absolute bg-grid-black/[0.1] dark:bg-grid-white/[0.2]" />
-//     </div>
-//   );
-// };
