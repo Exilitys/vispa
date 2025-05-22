@@ -22,10 +22,27 @@ export default function CourseGridSection() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [completedCourses, setcompletedCourses] = useState<number[]>([]);
 
   useEffect(() => {
     const fetchCourses = async () => {
       setLoading(true);
+
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+      if (userError || !user) console.error("Auth Error:");
+
+      const { data: userRow, error: userRowError } = await supabase
+        .from("MsUser")
+        .select("*")
+        .eq("uuid", user?.id)
+        .single();
+      if (userRowError || !userRow) console.error("Erro Fetching User:");
+
+      setcompletedCourses(userRow.completed_lessons || []);
+
       const { data, error } = await supabase
         .from("MsCourses")
         .select("*")
@@ -81,6 +98,7 @@ export default function CourseGridSection() {
                 header={<Skeleton src={course.image} />}
                 links={`/learn_start/${course.id}`}
                 className="h-fit"
+                completed={completedCourses.includes(course.id)}
               />
             ))
           ) : (

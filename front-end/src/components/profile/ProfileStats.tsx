@@ -69,7 +69,7 @@ export default function ProfileStats() {
       </div>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-row-2 gap-3 md:w-xl">
         {/* Learning Stats Card */}
         <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 space-y-4">
           <h2 className="font-semibold text-lg md:text-xl">
@@ -104,7 +104,7 @@ export default function ProfileStats() {
         </div>
 
         {/* Current Streak Card */}
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col justify-center">
+        <div className="bg-white dark:bg-gray-900 rounded-xl   p-6 flex flex-col justify-center">
           <div className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300 mb-2">
             <Flame className="w-4 h-4 text-purple-600" />
             <span>Current Streak</span>

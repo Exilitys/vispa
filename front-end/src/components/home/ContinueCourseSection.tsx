@@ -1,36 +1,75 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { createClient } from "../../../utils/supabase/Client";
 import { BentoGridItem } from "../ui/bento-grid";
 import { cn } from "@/lib/utils";
-
-import { IconClockHour1 } from "@tabler/icons-react";
-import { IconBook } from "@tabler/icons-react";
+import { IconClockHour1, IconBook } from "@tabler/icons-react";
 
 interface ContinueCourseSectionProps {
   className?: string;
 }
 
-export default async function ContinueCourseSection({
+interface Course {
+  id: number;
+  course_name: string;
+  description: string;
+  image?: string;
+  dificulty: string;
+  length: number;
+}
+
+export default function ContinueCourseSection({
   className,
 }: ContinueCourseSectionProps) {
+  const [courses, setCourses] = useState<Course[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
 
-  const { data: courses, error } = await supabase
-    .from("MsCourses")
-    .select("id, course_name, description, image, dificulty, length")
-    .limit(3);
+  useEffect(() => {
+    const fetchCourses = async () => {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+      if (userError || !user) return setError("Auth error");
 
-  if (error || !courses) {
-    console.error("Error fetching courses:", error?.message);
-    return <p className="text-center text-red-500">Failed to load courses.</p>;
-  }
+      const { data: userRow, error: userRowError } = await supabase
+        .from("MsUser")
+        .select("*")
+        .eq("uuid", user.id)
+        .single();
+      if (userRowError || !userRow) return setError("User fetch error");
+
+      const completedCourses = userRow.completed_lessons || [];
+      console.log("Completed courses:", userRow);
+
+      const { data: courses, error: coursesError } = await supabase
+        .from("MsCourses")
+        .select("id, course_name, description, image, dificulty, length")
+        .not("id", "in", `(${completedCourses.join(",")})`)
+        .limit(3);
+
+      if (coursesError) return setError("Course fetch error");
+
+      setCourses(courses);
+      setLoading(false);
+    };
+
+    fetchCourses();
+  }, []);
+
+  if (loading) return <p className="text-center">Loading...</p>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
     <div className={cn(className)}>
       <h2 className="text-2xl font-bold text-black dark:text-white max-w-4xl mx-auto my-5 text-center md:text-left">
         Explore new courses
       </h2>
-      <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 md:auto-rows-[18rem] md:grid-cols-3  my-12">
-        {courses.map((course) => (
+      <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 md:auto-rows-[18rem] md:grid-cols-3 my-12">
+        {courses?.map((course) => (
           <BentoGridItem
             key={course.id}
             title={course.course_name}
@@ -75,7 +114,7 @@ const CourseDescription = ({
       ? "text-yellow-500"
       : difficulty.toLowerCase() === "hard"
       ? "text-red-500"
-      : "text-gray-500"; // fallback if unknown
+      : "text-gray-500";
 
   return (
     <div className="text-sm text-gray-600 dark:text-gray-400 space-y-4">
