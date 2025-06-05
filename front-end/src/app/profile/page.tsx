@@ -2,10 +2,10 @@ import Navbar from "@/components/ui/navbar";
 import FloatingNavbar from "@/components/ui/floating-navbar";
 import ProfileStats from "@/components/profile/ProfileStats";
 import ProfilePicture from "@/components/profile/ProfilePicture";
-// import ContinueCourseSection from "@/components/home/ContinueCourseSection";
+import ContinueCourseSection from "@/components/home/ContinueCourseSection";
 import FooterSection from "@/components/home/FooterSection";
 import SignOutButton from "@/components/profile/SignOutButton"; // ✅ Import client button
-import CompletedCourseSection from "@/components/profile/CompletedCourseSection";
+// import CompletedCourseSection from "@/components/profile/CompletedCourseSection";
 
 export default async function Profile() {
   return (
