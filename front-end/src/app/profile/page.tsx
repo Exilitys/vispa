@@ -18,7 +18,7 @@ export default async function Profile() {
           <ProfileStats />
         </div>
         {/* Completed Courses */}
-        <CompletedCourseSection className="mb-32" />
+{/*         <CompletedCourseSection className="mb-32" /> */}
         <ContinueCourseSection className="mb-32" />
         <div className="mx-auto flex justify-center items-center">
           <SignOutButton /> {/* ✅ Client button inserted here */}
