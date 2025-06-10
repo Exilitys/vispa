@@ -138,7 +138,7 @@ export default function QuizClient({
             className="mx-auto  bg-blue-500 text-white py-3 rounded-lg transition-all hover:bg-blue-600 hover:cursor-pointer"
             asChild
           >
-            <p className="text-2xl">Sumbit</p>
+            <p className="text-2xl">Submit</p>
           </Button>
           {answered && isCorrect && (
             <Button
