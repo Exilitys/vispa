@@ -44,7 +44,7 @@ export default function CompletedCourseSection({
         .select("completed_lessons")
         .eq("uuid", user.id)
         .single();
-      if (rowErr || !userRow) return setError("Couldn't load your record");
+      if (rowErr || !userRow) return setError("Couldn&apos;t load your record");
 
       if (
         Array.isArray(userRow.completed_lessons) &&
@@ -54,7 +54,7 @@ export default function CompletedCourseSection({
           .from("MsCourses")
           .select("id, course_name, description, image, dificulty, length")
           .in("id", userRow.completed_lessons as number[]);
-        if (courseErr) return setError("Couldn't load courses");
+        if (courseErr) return setError("Couldn&apos;t load courses");
         setCourses(data || []);
       }
 
@@ -84,7 +84,7 @@ export default function CompletedCourseSection({
   if (!courses.length)
     return (
       <p className="text-center text-gray-500">
-        You haven't completed any courses yet.
+        You haven&apos;t completed any courses yet.
       </p>
     );
 
